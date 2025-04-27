@@ -33,7 +33,7 @@ jobs:
         run: npx playwright test
 
       - name: Generate Allure report
-        run: npm run report
+        run: npm run generate-report
 
   deploy:
     needs: test
