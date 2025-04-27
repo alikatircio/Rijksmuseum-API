@@ -10,6 +10,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      BASE_URL: https://www.rijksmuseum.nl/api
+      RIJKSMUSEUM_API_KEY: ${{ secrets.RIJKSMUSEUM_API_KEY }}
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
