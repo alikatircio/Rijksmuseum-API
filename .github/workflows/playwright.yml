@@ -26,26 +26,18 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install Allure commandline
-        run: npm install -g allure-commandline
-
       - name: Run Playwright tests
         run: npx playwright test
 
       - name: Generate Allure report
-        run: npm run generate-report
-
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+        run: |
+          npm install -g allure-commandline
+          allure generate allure-results -o allure-report --clean
 
       - name: Deploy Allure report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          personal_token: ${{ secrets.PERSONAL_TOKEN }}
-          publish_dir: ./allure-report
-          publish_branch: gh-pages
-          force_orphan: true
+          github_token: ${{ secrets.GITHUB_TOKEN }} 
+            publish_dir: ./allure-report
+            publish_branch: gh-pages
+            keep_files: false
