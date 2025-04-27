@@ -26,6 +26,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Install Allure commandline
+        run: npm install -g allure-commandline
+
       - name: Run Playwright tests
         run: npx playwright test
 
