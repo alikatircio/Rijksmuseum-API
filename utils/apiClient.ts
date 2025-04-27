@@ -7,7 +7,9 @@ const BASE_URL = process.env.BASE_URL;
 const API_KEY = process.env.RIJKSMUSEUM_API_KEY;
 
 if (!BASE_URL || !API_KEY) {
-  throw new Error("BASE_URL or RIJKSMUSEUM_API_KEY is not defined in .env");
+  throw new Error(
+    "BASE_URL or RIJKSMUSEUM_API_KEY environment variables are missing."
+  );
 }
 
 export const apiClient = axios.create({

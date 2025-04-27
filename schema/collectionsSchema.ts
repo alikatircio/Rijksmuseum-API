@@ -1,38 +1,52 @@
 import { z } from "zod";
 
-const LinksObjectSchema = z.object({
-  self: z.string(),
-  web: z.string(),
-});
-
-const WebSchema = z.object({
-  guid: z.string(),
-  offsetPercentageX: z.number(),
-  offsetPercentageY: z.number(),
-  width: z.number(),
-  height: z.number(),
-  url: z.string(),
-});
-const HeaderImageSchema = z.object({
-  guid: z.string(),
-  offsetPercentageX: z.number(),
-  offsetPercentageY: z.number(),
-  width: z.number(),
-  height: z.number(),
-  url: z.string(),
-});
-
 export const ArtObjectSchema = z.object({
-  links: LinksObjectSchema.optional(),
   id: z.string().optional(),
-  title: z.string().optional(),
-  objectNumber: z.string().optional(),
-  hasImage: z.boolean().optional(),
-  principalOrFirstMaker: z.string().optional(),
-  longTitle: z.string().optional(),
-  showImage: z.boolean().optional(),
-  permitDownload: z.boolean().optional(),
-  web: WebSchema.optional(),
-  headerImage: HeaderImageSchema.optional(),
+  objectNumber: z.string(),
+  title: z.string(),
+  principalOrFirstMaker: z.string(),
+  hasImage: z.boolean(),
   productionPlaces: z.array(z.string()).optional(),
+});
+
+export const CollectionListSchema = z.object({
+  artObjects: z.array(ArtObjectSchema),
+});
+
+export const ArtObjectDetailSchema = z.object({
+  artObject: z.object({
+    id: z.string(),
+    title: z.string(),
+    objectNumber: z.string(),
+    principalOrFirstMaker: z.string(),
+    description: z.string().optional(),
+    productionPlaces: z.array(z.string()).optional(),
+    hasImage: z.boolean().optional(),
+    webImage: z
+      .object({
+        guid: z.string(),
+        url: z.string(),
+        width: z.number(),
+        height: z.number(),
+        offsetPercentageX: z.number(),
+        offsetPercentageY: z.number(),
+      })
+      .optional(),
+    headerImage: z
+      .object({
+        guid: z.string(),
+        url: z.string(),
+        width: z.number(),
+        height: z.number(),
+        offsetPercentageX: z.number(),
+        offsetPercentageY: z.number(),
+      })
+      .optional(),
+  }),
+});
+
+export const ErrorResponseSchema = z.object({
+  status: z.number(),
+  error: z.string(),
+  message: z.string().optional(),
 });
