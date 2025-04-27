@@ -10,10 +10,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    env:
-      BASE_URL: https://www.rijksmuseum.nl/api
-      RIJKSMUSEUM_API_KEY: ${{ secrets.RIJKSMUSEUM_API_KEY }}
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -21,23 +17,20 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install dependencies
         run: npm install
-
-      - name: Install Allure commandline
-        run: npm install -g allure-commandline
 
       - name: Run Playwright tests
         run: npx playwright test
 
       - name: Generate Allure report
         run: |
-          allure generate allure/results --clean -o allure/report
+          npx allure generate allure-results --clean -o allure-report
 
-      - name: Upload Allure report
-        uses: actions/upload-artifact@v4
+      - name: Deploy Allure report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          name: allure-report
-          path: allure/report
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
