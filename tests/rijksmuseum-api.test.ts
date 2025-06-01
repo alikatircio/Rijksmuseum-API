@@ -79,8 +79,8 @@ test.describe("Collection API Tests", () => {
             const res = await client.get("/collection", {
               params: { q: artist },
             });
-            expect(res.status).toBe(200);
-            expect(res.data.artObjects.length).toBeGreaterThan(0);
+            expect.soft(res.status).toBe(200);
+            expect.soft(res.data.artObjects.length).toBeGreaterThan(0);
             return res;
           });
 
@@ -95,7 +95,7 @@ test.describe("Collection API Tests", () => {
               longTitle.includes(artist.toLowerCase())
             );
           });
-          expect(found).toBe(true);
+          expect.soft(found).toBe(true);
         });
       });
     }
@@ -128,8 +128,8 @@ test.describe("Collection API Tests", () => {
     await test.step("Validate each collection has a valid webImage", async () => {
       expect(response.data.artObjects.length).toBeGreaterThan(0);
       response.data.artObjects.forEach((artObject: any) => {
-        expect(artObject.webImage).toBeTruthy();
-        expect(artObject.webImage.url).toContain("http");
+        expect.soft(artObject.webImage).toBeTruthy();
+        expect.soft(artObject.webImage.url).toContain("http");
       });
       CollectionListSchema.parse(response.data);
     });
@@ -149,7 +149,7 @@ test.describe("Collection API Tests", () => {
       expect(response.data.artObjects.length).toBeGreaterThan(0);
       response.data.artObjects.forEach((artObject: any) => {
         if (artObject.productionPlaces.length > 0) {
-          expect(artObject.productionPlaces).toContain("Amsterdam");
+          expect.soft(artObject.productionPlaces).toContain("Amsterdam");
         }
       });
       CollectionListSchema.parse(response.data);
@@ -181,6 +181,62 @@ test.describe("Collection API Tests", () => {
       const firstPageFirstObject = page1.data.artObjects[0].objectNumber;
       const secondPageFirstObject = page2.data.artObjects[0].objectNumber;
       expect(firstPageFirstObject).not.toBe(secondPageFirstObject);
+    });
+  });
+});
+
+test.describe("Negative Test Scenarios", () => {
+  let client: ReturnType<typeof getClient>;
+
+  test.beforeAll(() => {
+    client = getClient("en");
+  });
+
+  test("should return 401 for missing API key", async () => {
+    await test.step("Request without key param", async () => {
+      try {
+        await axios.get(
+          "https://www.rijksmuseum.nl/api/en/collection?q=rembrandt"
+        );
+        throw new Error("Request should have failed");
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          expect(error.response?.status).toBe(401);
+        } else {
+          throw error;
+        }
+      }
+    });
+  });
+
+  test("should return 401 for invalid API key", async () => {
+    await test.step("Request with invalid key", async () => {
+      try {
+        await axios.get("https://www.rijksmuseum.nl/api/en/collection", {
+          params: {
+            key: "INVALID_KEY",
+            q: "rembrandt",
+          },
+        });
+        throw new Error("Request should have failed");
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          expect(error.response?.status).toBe(401);
+        } else {
+          throw error;
+        }
+      }
+    });
+  });
+
+  test("should return 200 but empty result for nonsense search", async () => {
+    await test.step("Search with meaningless string", async () => {
+      const response = await client.get("/collection", {
+        params: { q: "asdqwezxc!@#" },
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.data.artObjects.length).toBe(0);
     });
   });
 });
